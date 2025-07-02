@@ -1,8 +1,33 @@
 <!DOCTYPE html>
 <html>
-  <head><title>SP Schedule Sync</title></head>
+  <head>
+    <title>SP Schedule Sync</title>
+   
+  </head>
   <body>
-    <button id="syncButton">Scrape Schedule</button>
-    <script src="popup.js"></script>
+
+   
+
+    <h2> Step 1 Log in</h2>
+  <div id="loggedOut">
+    <p>Please log in</p>
+    <button id="authBtn">Log In</button>
+    
+  </div>
+
+
+  <h2> Step 2 verify login </h2>
+  <div id="loggedIn">
+    <p>Logged in as <span id="userEmail"></span></p>      
+  </div>
+
+  <hr />
+  <hr />
+<h2> Step 3 scrape </h2>
+   <button id="syncButton">Scrape Schedule</button>            
+      
+   <script src="auth.js"></script>
+<script src="popup.js"></script>
+  
   </body>
 </html>

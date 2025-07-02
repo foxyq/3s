@@ -7,21 +7,51 @@ document.getElementById('syncButton').addEventListener('click', async () => {
   });
 });
 
-
-
-
 async function scrapeFromIframe() {
-  function test() {
-    console.log('Test function called');
+  // Helper to parse date for sorting (handles empty dates)
+  function parseDate(date) {
+    return date ? new Date(date) : new Date(0);
   }
 
+  function sortEvents(events, work, training, timeOff) {
+    events.forEach(ev => {
+      const t = ev.title.toUpperCase();
+
+      if (ev.date === '') {
+        return
+      }
+      // Training
+      if (
+        t.includes('CLASS') ||
+        t.includes('ECMO') ||
+        t.includes('EPIC') ||
+        t.includes('QUALITY') ||
+        t.includes('TRAINING') ||
+        t.includes('EDUCATION') ||
+        t.includes('NURSING')
+      ) {
+        training.push(ev);
+      }
+      // Time Off
+      else if (
+        t.includes('VACATION') ||
+        t.includes('OFF') ||
+        t.includes('NON SCHED DAY') ||
+        t.includes('TIME OFF REQUEST') ||
+        t.includes('SELF SCHEDULE')
+      ) {
+        timeOff.push(ev);
+      }
+      // Work
+      else {
+        work.push(ev);
+      }
+    });
+  }
 
   const rows = document.querySelectorAll('.fc-widget-content .fc-row.fc-week .fc-content-skeleton');
-
   console.log(rows.length, 'rows found');
   let events = [];
-
-  test()
 
   rows.forEach(row => {
     // 1. Extract dates from thead cells
@@ -37,7 +67,8 @@ async function scrapeFromIframe() {
         // Only process if this td contains an event
         const eventLink = td.querySelector('a.fc-day-grid-event');
         if (eventLink) {
-          // Extract title
+
+          // const title = getTitle();
           let title = eventLink.querySelector('.event-title')?.textContent?.trim();
           if (!title) {
             // Some events use .fc-title instead
@@ -73,14 +104,6 @@ async function scrapeFromIframe() {
     });
   });
 
-  // console.log('Extracted events:', events);
-
-  // Helper to parse date for sorting (handles empty dates)
-  function parseDate(date) {
-    return date ? new Date(date) : new Date(0);
-  }
-
-
   // Sort by date ascending
   events.sort((a, b) => parseDate(a.date) - parseDate(b.date));
 
@@ -88,43 +111,10 @@ async function scrapeFromIframe() {
   const training = [];
   const timeOff = [];
 
-  // console.log(events)
-
-  events.forEach(ev => {
-    const t = ev.title.toUpperCase();
-
-    // Training
-    if (
-      t.includes('CLASS') ||
-      t.includes('ECMO') ||
-      t.includes('EPIC') ||
-      t.includes('QUALITY') ||
-      t.includes('TRAINING') ||
-      t.includes('EDUCATION') ||
-      t.includes('NURSING')
-    ) {
-      training.push(ev);
-    }
-    // Time Off
-    else if (
-      t.includes('VACATION') ||
-      t.includes('OFF') ||
-      t.includes('NON SCHED DAY') ||
-      t.includes('TIME OFF REQUEST') ||
-      t.includes('SELF SCHEDULE')
-    ) {
-      timeOff.push(ev);
-    }
-    // Work
-    else {
-      work.push(ev);
-    }
-  });
+  sortEvents(events, work, training, timeOff)
 
 
-
-  const realTimeOff = timeOff.filter(day => day.date !== '')
-  console.log({ work, training, realTimeOff });
+  console.log({ work, training, timeOff });
 
 
 
